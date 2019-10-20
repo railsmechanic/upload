@@ -11,11 +11,11 @@ defmodule UploadTest do
       cast_path: 2
     ]
 
-  @fixture Path.expand("./fixtures/text.txt", __DIR__)
-  @plug %Plug.Upload{path: @fixture, filename: "text.txt"}
+  @fixture Path.expand("./fixtures/data.txt", __DIR__)
+  @plug %Plug.Upload{path: @fixture, filename: "data.txt"}
 
   test "get_url/1 and transfer/1" do
-    start_supervised(Upload.Adapters.Test)
+    start_supervised(Upload.Adapter.Test)
 
     assert {:ok, upload} = Upload.cast_path(@fixture)
     assert {:ok, upload} = Upload.transfer(upload)
@@ -25,7 +25,7 @@ defmodule UploadTest do
   end
 
   test "get_signed_url/2" do
-    start_supervised(Upload.Adapters.Test)
+    start_supervised(Upload.Adapter.Test)
 
     assert {:ok, upload} = Upload.cast_path(@fixture)
     assert {:ok, upload} = Upload.transfer(upload)
@@ -39,7 +39,8 @@ defmodule UploadTest do
   end
 
   test "generate_key/2" do
-    assert Upload.generate_key("phoenix.png", prefix: ["logos"]) =~ ~r"^logos/[a-z0-9]{32}\.png$"
+    assert Upload.generate_key("phoenix.png", prefix: ["logos"]) =~
+             ~r"^logos/[a-z0-9]{32}\.png$"
   end
 
   test "cast/1 with a %Plug.Upload{}" do
@@ -47,7 +48,7 @@ defmodule UploadTest do
     assert upload.path == @plug.path
     assert upload.filename == @plug.filename
     assert upload.key =~ ~r"^[a-z0-9]{32}\.txt$"
-    assert upload.status == :pending
+    assert upload.transferred == true
   end
 
   test "cast/1 with an %Upload{}" do

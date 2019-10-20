@@ -70,7 +70,7 @@ if Code.ensure_compiled?(Ecto) do
           Ecto.Changeset.add_error(changeset, field, message)
 
         other ->
-          raise """
+          raise ~s(
           Expected #{inspect(uploader)}.#{action}/2 to return one of the following:
 
             {:ok, %Upload{}}          - Casting was successful
@@ -80,7 +80,7 @@ if Code.ensure_compiled?(Ecto) do
           Instead, it returned:
 
             #{inspect(other)}
-          """
+          )
       end
     end
 
@@ -92,7 +92,7 @@ if Code.ensure_compiled?(Ecto) do
     @spec put_upload(Ecto.Changeset.t(), atom, Upload.t(), list) :: Ecto.Changeset.t()
     def put_upload(changeset, field, upload, opts \\ [])
 
-    def put_upload(changeset, field, %Upload{status: :pending, key: key} = upload, opts) do
+    def put_upload(changeset, field, %Upload{transferred?: false, key: key} = upload, opts) do
       uploader = Keyword.get(opts, :with, Upload)
 
       changeset
@@ -120,7 +120,7 @@ if Code.ensure_compiled?(Ecto) do
       end)
     end
 
-    def put_upload(changeset, field, %Upload{status: :transferred, key: key}, _opts) do
+    def put_upload(changeset, field, %Upload{transferred?: true, key: key}, _opts) do
       put_change(changeset, field, key)
     end
   end

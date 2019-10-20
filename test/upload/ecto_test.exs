@@ -5,9 +5,9 @@ defmodule Upload.EctoTest do
 
   doctest Upload.Ecto
 
-  alias Upload.Adapters.Test, as: Adapter
+  alias Upload.Adapter.Test, as: Adapter
 
-  @fixture Path.expand("../fixtures/text.txt", __DIR__)
+  @fixture Path.expand("../fixtures/data.txt", __DIR__)
   @filename ~r"^[a-z0-9]{32}\.txt$"
 
   defmodule Company do
@@ -65,7 +65,7 @@ defmodule Upload.EctoTest do
     end
 
     test "assigns uploads that have already been transferred", %{upload: upload} do
-      upload = %Upload{upload | status: :transferred}
+      upload = %Upload{upload | transferred?: true}
       changeset = Company.change()
       changeset = Upload.Ecto.put_upload(changeset, :logo, upload)
       assert get_field(changeset, :logo)
